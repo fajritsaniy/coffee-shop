@@ -17,14 +17,12 @@ func NewPaymentRepository() PaymentRepository {
 }
 
 func (repository *PaymentRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, payment domain.Payment) domain.Payment {
-	SQL := "insert into payments(order_id, payment_gateway, payment_reference, paid_at, amount, status) values ($1, $2, $3, $4, $5, $6 )"
-	result, err := tx.ExecContext(ctx, SQL, payment.OrderID, payment.PaymentGateway, payment.PaymentReference, payment.PaidAt, payment.Amount, payment.Status)
+	SQL := "insert into payments(order_id, payment_gateway, payment_reference, paid_at, amount, status) values ($1, $2, $3, $4, $5, $6 ) RETURNING id"
+	var id int
+	err := tx.QueryRowContext(ctx, SQL, payment.OrderID, payment.PaymentGateway, payment.PaymentReference, payment.PaidAt, payment.Amount, payment.Status).Scan(&id)
 	helper.PanicIfError(err)
 
-	id, err := result.LastInsertId()
-	helper.PanicIfError(err)
-
-	payment.ID = int(id)
+	payment.ID = id
 	return payment
 }
 

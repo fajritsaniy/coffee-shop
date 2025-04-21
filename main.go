@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/fajri/coffee-api/app"
@@ -15,13 +16,23 @@ import (
 
 func main() {
 
+	fmt.Println("Service is running...")
 	db := app.NewDB()
 	validate := validator.New()
+	// Table
 	tableRepository := repository.NewTableRepository()
 	tableService := service.NewTableService(tableRepository, db, validate)
 	tableController := controller.NewTableController(tableService)
+	// MenuCategory
+	menuCategoryRepository := repository.NewMenuCategoryRepository()
+	menuCategoryService := service.NewMenuCategoryService(menuCategoryRepository, db, validate)
+	menuCategoryController := controller.NewMenuCategoryController(menuCategoryService)
+	// MenuItem
+	menuItemRepository := repository.NewMenuItemRepository()
+	menuItemService := service.NewMenuItemService(menuItemRepository, db, validate)
+	menuItemController := controller.NewMenuItemController(menuItemService)
 
-	router := app.NewRouter(tableController)
+	router := app.NewRouter(tableController, menuCategoryController, menuItemController)
 
 	server := http.Server{
 		Addr:    "localhost:3000",

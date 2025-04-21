@@ -17,14 +17,12 @@ func NewMenuItemRepository() MenuItemRepository {
 }
 
 func (repository *MenuItemRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, menuItem domain.MenuItem) domain.MenuItem {
-	SQL := "insert into menu_items(category_id, name, price, description, is_available, image_url) values ($1, $2, $3, $4, $5, $6)"
-	result, err := tx.ExecContext(ctx, SQL, menuItem.CategoryID, menuItem.Name, menuItem.Price, menuItem.Description, menuItem.IsAvailable, menuItem.ImageURL)
+	SQL := "insert into menu_items(category_id, name, price, description, is_available, image_url) values ($1, $2, $3, $4, $5, $6) RETURNING id"
+	var id int
+	err := tx.QueryRowContext(ctx, SQL, menuItem.CategoryID, menuItem.Name, menuItem.Price, menuItem.Description, menuItem.IsAvailable, menuItem.ImageURL).Scan(&id)
 	helper.PanicIfError(err)
 
-	id, err := result.LastInsertId()
-	helper.PanicIfError(err)
-
-	menuItem.ID = int(id)
+	menuItem.ID = id
 	return menuItem
 }
 
@@ -50,7 +48,7 @@ func (repository *MenuItemRepositoryImpl) FindById(ctx context.Context, tx *sql.
 
 	menuItem := domain.MenuItem{}
 	if rows.Next() {
-		err := rows.Scan(&menuItem.ID, &menuItem.Name, &menuItem.Price, &menuItem.CategoryID)
+		err := rows.Scan(&menuItem.ID, &menuItem.CategoryID, &menuItem.Name, &menuItem.Price, &menuItem.Description, &menuItem.IsAvailable, &menuItem.ImageURL)
 		helper.PanicIfError(err)
 		return menuItem, nil
 	} else {
@@ -59,14 +57,14 @@ func (repository *MenuItemRepositoryImpl) FindById(ctx context.Context, tx *sql.
 }
 
 func (repository *MenuItemRepositoryImpl) FindByCategoryID(ctx context.Context, tx *sql.Tx, categoryId int) (domain.MenuItem, error) {
-	SQL := "select id, category_id, name, price, description, is_available, image_url from menu_items where menu_category_id = $1"
+	SQL := "select id, category_id, name, price, description, is_available, image_url from menu_items where category_id = $1"
 	rows, err := tx.QueryContext(ctx, SQL, categoryId)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
 	menuItem := domain.MenuItem{}
 	if rows.Next() {
-		err := rows.Scan(&menuItem.ID, &menuItem.Name, &menuItem.Price, &menuItem.CategoryID)
+		err := rows.Scan(&menuItem.ID, &menuItem.CategoryID, &menuItem.Name, &menuItem.Price, &menuItem.Description, &menuItem.IsAvailable, &menuItem.ImageURL)
 		helper.PanicIfError(err)
 		return menuItem, nil
 	} else {
@@ -75,7 +73,7 @@ func (repository *MenuItemRepositoryImpl) FindByCategoryID(ctx context.Context, 
 }
 
 func (repository *MenuItemRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.MenuItem {
-	SQL := "select id, id, category_id, name, price, description, is_available, image_url from menu_items"
+	SQL := "select id, category_id, name, price, description, is_available, image_url from menu_items"
 	rows, err := tx.QueryContext(ctx, SQL)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -83,7 +81,7 @@ func (repository *MenuItemRepositoryImpl) FindAll(ctx context.Context, tx *sql.T
 	var menuItems []domain.MenuItem
 	for rows.Next() {
 		menuItem := domain.MenuItem{}
-		err := rows.Scan(&menuItem.ID, &menuItem.Name, &menuItem.Price, &menuItem.CategoryID)
+		err := rows.Scan(&menuItem.ID, &menuItem.CategoryID, &menuItem.Name, &menuItem.Price, &menuItem.Description, &menuItem.IsAvailable, &menuItem.ImageURL)
 		helper.PanicIfError(err)
 		menuItems = append(menuItems, menuItem)
 	}

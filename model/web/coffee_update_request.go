@@ -30,10 +30,8 @@ type UpdateOrderRequest struct {
 }
 
 type UpdateOrderItemRequest struct {
-	ID       int `validate:"required,max=200,min=1" json:"id"`
-	OrderID  int `json:"order_id"`
-	MenuID   int `json:"menu_id"`
-	Quantity int `json:"quantity"`
+	ID    int                    `validate:"required,max=200,min=1" json:"id"`
+	Items []CreateOrderItemInput `json:"items"`
 }
 
 type UpdatePaymentStatusRequest struct {

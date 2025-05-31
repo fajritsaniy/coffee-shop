@@ -71,7 +71,7 @@ func ToOrderDetailResponse(order domain.Order, orderItems []domain.OrderItem) we
 		PaymentStatus: order.PaymentStatus,
 		Total:         order.Total,
 		OrderItems:    orderItems,
-		CreatedAt:     order.CreatedAt.Format("2025-04-19T15:04:05+07:00"),
+		CreatedAt:     order.CreatedAt.Format("2006-01-02T15:04:05-07:00"),
 	}
 }
 
@@ -83,7 +83,7 @@ func ToOrderResponse(order domain.Order) web.OrderResponse {
 		Status:        order.Status,
 		PaymentStatus: order.PaymentStatus,
 		Total:         order.Total,
-		CreatedAt:     order.CreatedAt.Format("2025-04-19T15:04:05+07:00"),
+		CreatedAt:     order.CreatedAt.Format("2006-01-02T15:04:05-07:00"),
 	}
 }
 
@@ -114,7 +114,7 @@ func ToPaymentResponse(payment domain.Payment) web.PaymentResponse {
 		OrderID:          payment.OrderID,
 		PaymentGateway:   payment.PaymentGateway,
 		PaymentReference: payment.PaymentReference,
-		PaidAt:           payment.PaidAt.Format("2025-04-19T15:04:05+07:00"),
+		PaidAt:           payment.PaidAt.Format("2006-01-02T15:04:05-07:00"),
 		Amount:           payment.Amount,
 		Status:           payment.Status,
 	}

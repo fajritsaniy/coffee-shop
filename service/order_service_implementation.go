@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/fajri/coffee-api/exception"
 	"github.com/fajri/coffee-api/helper"
@@ -40,8 +41,11 @@ func (service *OrderServiceImpl) Create(ctx context.Context, request web.CreateO
 
 	// Save Order
 	order := domain.Order{
-		TableID: request.TableID,
-		Total:   request.Total,
+		TableID:       request.TableID,
+		Status:        "PENDING",
+		PaymentStatus: "UNPAID",
+		Total:         0,
+		CreatedAt:     time.Now(),
 	}
 
 	order = service.OrderRepository.Save(ctx, tx, order)
@@ -59,10 +63,15 @@ func (service *OrderServiceImpl) Create(ctx context.Context, request web.CreateO
 			Price:    menuItem.Price,
 			Quantity: item.Quantity,
 		}
-		total += int(menuItem.Price)
+		total += int(orderItem.Price * float64(item.Quantity))
 		orderItem = service.OrderItemRepository.Save(ctx, tx, orderItem)
 		orderItems = append(orderItems, orderItem)
 	}
+
+	// Update total amount
+	order.Total = float64(total)
+	order = service.OrderRepository.Update(ctx, tx, order)
+
 	return helper.ToOrderDetailResponse(order, orderItems)
 }
 
@@ -95,7 +104,7 @@ func (service *OrderServiceImpl) UpdateOrder(ctx context.Context, request web.Up
 	return helper.ToOrderDetailResponse(order, orderItems)
 }
 
-func (service *OrderServiceImpl) UpdateOrderItem(ctx context.Context, request web.UpdateOrderItemRequest) web.OrderItemResponse {
+func (service *OrderServiceImpl) UpdateOrderItem(ctx context.Context, request web.UpdateOrderItemRequest) web.OrderDetailResponse {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
 
@@ -104,16 +113,39 @@ func (service *OrderServiceImpl) UpdateOrderItem(ctx context.Context, request we
 	defer helper.CommitOrRollback(tx)
 
 	// Get Order Items
-	orderItem, err := service.OrderItemRepository.FindById(ctx, tx, request.ID)
+	orders, err := service.OrderRepository.FindById(ctx, tx, request.ID)
 	if err != nil {
 		panic(exception.NewNotFoundError(err.Error()))
 	}
 
-	orderItem.MenuID = request.MenuID
-	orderItem.Quantity = request.Quantity
-	service.OrderItemRepository.Update(ctx, tx, orderItem)
+	// Get Order
+	orderItemsBefore, err := service.OrderItemRepository.FindByOrderId(ctx, tx, request.ID)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 
-	return helper.ToOrderItemResponse(orderItem)
+	orderItems := orderItemsBefore
+	total := orders.Total
+	// Save Order Items
+	for _, item := range request.Items {
+		menuItem, err := service.MenuItemRepository.FindById(ctx, tx, item.MenuID)
+		helper.PanicIfError(err)
+		orderItem := domain.OrderItem{
+			OrderID:  request.ID,
+			MenuID:   item.MenuID,
+			Price:    menuItem.Price,
+			Quantity: item.Quantity,
+		}
+		total += float64(menuItem.Price) * float64(item.Quantity)
+		orderItem = service.OrderItemRepository.Save(ctx, tx, orderItem)
+		orderItems = append(orderItems, orderItem)
+	}
+
+	// Update Order Total
+	orders.Total = total
+	orders = service.OrderRepository.Update(ctx, tx, orders)
+
+	return helper.ToOrderDetailResponse(orders, orderItems)
 }
 
 func (service *OrderServiceImpl) Delete(ctx context.Context, orderId int) {
@@ -159,10 +191,6 @@ func (service *OrderServiceImpl) FindById(ctx context.Context, orderId int) web.
 	orderItems, err = service.OrderItemRepository.FindByOrderId(ctx, tx, orderId)
 	if err != nil {
 		panic(exception.NewNotFoundError(err.Error()))
-	}
-
-	for _, item := range orderItems {
-		orderItems = append(orderItems, item)
 	}
 
 	return helper.ToOrderDetailResponse(order, orderItems)

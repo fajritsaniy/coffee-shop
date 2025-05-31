@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"time"
 
 	"github.com/fajri/coffee-api/helper"
 	"github.com/fajri/coffee-api/model/domain"
@@ -18,18 +17,12 @@ func NewOrderRepository() OrderRepository {
 }
 
 func (repository *OrderRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order {
-	SQL := "INSERT INTO orders (table_id, total) VALUES ($1, $2) RETURNING id,status,payment_status,created_at"
+	SQL := "INSERT INTO orders (table_id, status, payment_status, total, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id"
 	var id int
-	var status string
-	var paymentStatus string
-	var createdAt time.Time
-	err := tx.QueryRowContext(ctx, SQL, order.TableID, order.Total).Scan(&id, &status, &paymentStatus, &createdAt)
+	err := tx.QueryRowContext(ctx, SQL, order.TableID, order.Status, order.PaymentStatus, order.Total, order.CreatedAt).Scan(&id)
 	helper.PanicIfError(err)
 
 	order.ID = id
-	order.Status = status
-	order.PaymentStatus = paymentStatus
-	order.CreatedAt = createdAt
 	return order
 }
 

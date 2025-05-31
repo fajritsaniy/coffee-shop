@@ -31,8 +31,13 @@ func main() {
 	menuItemRepository := repository.NewMenuItemRepository()
 	menuItemService := service.NewMenuItemService(menuItemRepository, db, validate)
 	menuItemController := controller.NewMenuItemController(menuItemService)
+	// Order
+	orderRepository := repository.NewOrderRepository()
+	orderItemRepository := repository.NewOrderItemRepository()
+	orderService := service.NewOrderService(orderRepository, orderItemRepository, menuItemRepository, db, validate)
+	orderController := controller.NewOrderController(orderService)
 
-	router := app.NewRouter(tableController, menuCategoryController, menuItemController)
+	router := app.NewRouter(tableController, menuCategoryController, menuItemController, orderController)
 
 	server := http.Server{
 		Addr:    "localhost:3000",

@@ -38,11 +38,11 @@ type Order struct {
 
 // OrderItem represents an item in an order
 type OrderItem struct {
-	ID       int
-	OrderID  int
-	MenuID   int
-	Price    float64
-	Quantity int
+	ID       int     `json:"id"`
+	OrderID  int     `json:"order_id"`
+	MenuID   int     `json:"menu_id"`
+	Price    float64 `json:"price"`
+	Quantity int     `json:"quantity"`
 }
 
 // Payment represents a payment transaction

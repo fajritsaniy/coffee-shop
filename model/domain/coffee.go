@@ -43,6 +43,7 @@ type OrderItem struct {
 	MenuID   int     `json:"menu_id"`
 	Price    float64 `json:"price"`
 	Quantity int     `json:"quantity"`
+	Notes    string  `json:"notes,omitempty"` // Optional notes for the order item
 }
 
 // Payment represents a payment transaction

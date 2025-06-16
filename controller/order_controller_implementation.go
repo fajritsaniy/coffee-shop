@@ -14,7 +14,7 @@ type OrderControllerImpl struct {
 	OrderService service.OrderService
 }
 
-func NewController(orderService service.OrderService) OrderController {
+func NewOrderController(orderService service.OrderService) OrderController {
 	return &OrderControllerImpl{
 		OrderService: orderService,
 	}

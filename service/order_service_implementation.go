@@ -62,6 +62,7 @@ func (service *OrderServiceImpl) Create(ctx context.Context, request web.CreateO
 			MenuID:   item.MenuID,
 			Price:    menuItem.Price,
 			Quantity: item.Quantity,
+			Notes:    item.Notes,
 		}
 		total += int(orderItem.Price * float64(item.Quantity))
 		orderItem = service.OrderItemRepository.Save(ctx, tx, orderItem)

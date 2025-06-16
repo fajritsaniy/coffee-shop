@@ -25,8 +25,9 @@ type CreateOrderRequest struct {
 }
 
 type CreateOrderItemInput struct {
-	MenuID   int `json:"menu_id"`
-	Quantity int `json:"quantity"`
+	MenuID   int    `json:"menu_id"`
+	Quantity int    `json:"quantity"`
+	Notes    string `json:"notes,omitempty"` // Optional notes for the order item
 }
 
 type CreatePaymentRequest struct {

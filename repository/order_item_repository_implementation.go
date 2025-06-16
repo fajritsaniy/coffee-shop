@@ -19,9 +19,9 @@ func NewOrderItemRepository() OrderItemRepository {
 // 	Save(ctx context.Context, tx *sql.Tx, orderItems []domain.OrderItem) []domain.OrderItem
 
 func (repository *OrderItemRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, orderItem domain.OrderItem) domain.OrderItem {
-	SQL := "INSERT INTO order_items(order_id, menu_id, price, quantity) VALUES ($1, $2, $3, $4) RETURNING id"
+	SQL := "INSERT INTO order_items(order_id, menu_id, price, quantity, notes) VALUES ($1, $2, $3, $4, $5) RETURNING id"
 	var id int
-	err := tx.QueryRowContext(ctx, SQL, orderItem.OrderID, orderItem.MenuID, orderItem.Price, orderItem.Quantity).Scan(&id)
+	err := tx.QueryRowContext(ctx, SQL, orderItem.OrderID, orderItem.MenuID, orderItem.Price, orderItem.Quantity, orderItem.Notes).Scan(&id)
 	helper.PanicIfError(err)
 
 	orderItem.ID = id
@@ -43,14 +43,14 @@ func (repository *OrderItemRepositoryImpl) Delete(ctx context.Context, tx *sql.T
 }
 
 func (repository *OrderItemRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (domain.OrderItem, error) {
-	SQL := "select id, order_id, menu_id, price, quantity from order_items where id = $1"
+	SQL := "select id, order_id, menu_id, price, quantity, notes from order_items where id = $1"
 	rows, err := tx.QueryContext(ctx, SQL, id)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
 	orderItem := domain.OrderItem{}
 	if rows.Next() {
-		err := rows.Scan(&orderItem.ID, &orderItem.OrderID, &orderItem.MenuID, &orderItem.Price, &orderItem.Quantity)
+		err := rows.Scan(&orderItem.ID, &orderItem.OrderID, &orderItem.MenuID, &orderItem.Price, &orderItem.Quantity, &orderItem.Notes)
 		helper.PanicIfError(err)
 		return orderItem, nil
 	} else {
@@ -59,7 +59,7 @@ func (repository *OrderItemRepositoryImpl) FindById(ctx context.Context, tx *sql
 }
 
 func (repository *OrderItemRepositoryImpl) FindByOrderId(ctx context.Context, tx *sql.Tx, orderId int) ([]domain.OrderItem, error) {
-	SQL := "SELECT id, order_id, menu_id, price, quantity FROM order_items WHERE order_id = $1"
+	SQL := "SELECT id, order_id, menu_id, price, quantity, notes FROM order_items WHERE order_id = $1"
 	rows, err := tx.QueryContext(ctx, SQL, orderId)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -67,7 +67,7 @@ func (repository *OrderItemRepositoryImpl) FindByOrderId(ctx context.Context, tx
 	orderItems := []domain.OrderItem{}
 	for rows.Next() {
 		orderItem := domain.OrderItem{}
-		err := rows.Scan(&orderItem.ID, &orderItem.OrderID, &orderItem.MenuID, &orderItem.Price, &orderItem.Quantity)
+		err := rows.Scan(&orderItem.ID, &orderItem.OrderID, &orderItem.MenuID, &orderItem.Price, &orderItem.Quantity, &orderItem.Notes)
 		helper.PanicIfError(err)
 		orderItems = append(orderItems, orderItem)
 	}

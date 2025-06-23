@@ -57,9 +57,14 @@ func (service *OrderServiceImpl) Create(ctx context.Context, request web.CreateO
 	for _, item := range request.Items {
 		menuItem, err := service.MenuItemRepository.FindById(ctx, tx, item.MenuID)
 		helper.PanicIfError(err)
+		menuItemDetail := domain.MenuItemResponse{
+			ID:   menuItem.ID,
+			Name: menuItem.Name,
+		}
+
 		orderItem := domain.OrderItem{
 			OrderID:  order.ID,
-			MenuID:   item.MenuID,
+			Menu:     menuItemDetail,
 			Price:    menuItem.Price,
 			Quantity: item.Quantity,
 			Notes:    item.Notes,
@@ -131,11 +136,17 @@ func (service *OrderServiceImpl) UpdateOrderItem(ctx context.Context, request we
 	for _, item := range request.Items {
 		menuItem, err := service.MenuItemRepository.FindById(ctx, tx, item.MenuID)
 		helper.PanicIfError(err)
+		menuItemDetail := domain.MenuItemResponse{
+			ID:   menuItem.ID,
+			Name: menuItem.Name,
+		}
+
 		orderItem := domain.OrderItem{
 			OrderID:  request.ID,
-			MenuID:   item.MenuID,
+			Menu:     menuItemDetail,
 			Price:    menuItem.Price,
 			Quantity: item.Quantity,
+			Notes:    item.Notes,
 		}
 		total += float64(menuItem.Price) * float64(item.Quantity)
 		orderItem = service.OrderItemRepository.Save(ctx, tx, orderItem)

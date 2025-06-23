@@ -101,7 +101,7 @@ func ToOrderItemResponse(orderItem domain.OrderItem) web.OrderItemResponse {
 	return web.OrderItemResponse{
 		ID:       orderItem.ID,
 		OrderID:  orderItem.OrderID,
-		MenuID:   orderItem.MenuID,
+		MenuID:   orderItem.Menu.ID,
 		Price:    orderItem.Price,
 		Quantity: orderItem.Quantity,
 	}

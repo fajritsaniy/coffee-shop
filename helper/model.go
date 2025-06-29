@@ -67,6 +67,7 @@ func ToOrderDetailResponse(order domain.Order, orderItems []domain.OrderItem) we
 	return web.OrderDetailResponse{
 		ID:            order.ID,
 		TableID:       order.TableID,
+		Name:          order.Name,
 		Status:        order.Status,
 		PaymentStatus: order.PaymentStatus,
 		Total:         order.Total,
@@ -79,6 +80,7 @@ func ToOrderDetailResponse(order domain.Order, orderItems []domain.OrderItem) we
 func ToOrderResponse(order domain.Order) web.OrderResponse {
 	return web.OrderResponse{
 		ID:            order.ID,
+		Name:          order.Name,
 		TableID:       order.TableID,
 		Status:        order.Status,
 		PaymentStatus: order.PaymentStatus,

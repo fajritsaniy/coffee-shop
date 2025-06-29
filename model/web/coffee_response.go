@@ -25,6 +25,7 @@ type MenuItemResponse struct {
 
 type OrderDetailResponse struct {
 	ID            int                `json:"id"`
+	Name          string             `json:"name"`
 	TableID       int                `json:"table_id"`
 	Status        string             `json:"status"`
 	PaymentStatus string             `json:"payment_status"`
@@ -35,6 +36,7 @@ type OrderDetailResponse struct {
 
 type OrderResponse struct {
 	ID            int     `json:"id"`
+	Name          string  `json:"name"`
 	TableID       int     `json:"table_id"`
 	Status        string  `json:"status"`
 	PaymentStatus string  `json:"payment_status"`

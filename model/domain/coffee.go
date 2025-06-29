@@ -29,6 +29,7 @@ type MenuItem struct {
 // Order represents a customer order
 type Order struct {
 	ID            int
+	Name          string
 	TableID       int
 	Status        string
 	PaymentStatus string

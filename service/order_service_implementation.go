@@ -42,6 +42,7 @@ func (service *OrderServiceImpl) Create(ctx context.Context, request web.CreateO
 	// Save Order
 	order := domain.Order{
 		TableID:       request.TableID,
+		Name:          request.Name,
 		Status:        "PENDING",
 		PaymentStatus: "UNPAID",
 		Total:         0,

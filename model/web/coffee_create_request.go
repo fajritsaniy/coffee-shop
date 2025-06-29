@@ -20,6 +20,7 @@ type CreateMenuItemRequest struct {
 
 type CreateOrderRequest struct {
 	TableID int                    `json:"table_id"`
+	Name    string                 `json:"name"`
 	Items   []CreateOrderItemInput `json:"items"`
 	Total   float64                `json:"total"`
 }

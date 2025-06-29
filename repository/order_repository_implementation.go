@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/fajri/coffee-api/helper"
 	"github.com/fajri/coffee-api/model/domain"
@@ -17,9 +18,10 @@ func NewOrderRepository() OrderRepository {
 }
 
 func (repository *OrderRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, order domain.Order) domain.Order {
-	SQL := "INSERT INTO orders (table_id, status, payment_status, total, created_at) VALUES ($1, $2, $3, $4, $5) RETURNING id"
+	fmt.Println(order)
+	SQL := "INSERT INTO orders (table_id, name, status, payment_status, total, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id"
 	var id int
-	err := tx.QueryRowContext(ctx, SQL, order.TableID, order.Status, order.PaymentStatus, order.Total, order.CreatedAt).Scan(&id)
+	err := tx.QueryRowContext(ctx, SQL, order.TableID, order.Name, order.Status, order.PaymentStatus, order.Total, order.CreatedAt).Scan(&id)
 	helper.PanicIfError(err)
 
 	order.ID = id
@@ -41,14 +43,14 @@ func (repository *OrderRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, o
 }
 
 func (repository *OrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id int) (domain.Order, error) {
-	SQL := "SELECT id, table_id, status, payment_status, total, created_at FROM orders WHERE id = $1"
+	SQL := "SELECT id, name, table_id, status, payment_status, total, created_at FROM orders WHERE id = $1"
 	rows, err := tx.QueryContext(ctx, SQL, id)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
 	order := domain.Order{}
 	if rows.Next() {
-		err := rows.Scan(&order.ID, &order.TableID, &order.Status, &order.PaymentStatus, &order.Total, &order.CreatedAt)
+		err := rows.Scan(&order.ID, &order.Name, &order.TableID, &order.Status, &order.PaymentStatus, &order.Total, &order.CreatedAt)
 		helper.PanicIfError(err)
 		return order, nil
 	} else {
@@ -58,7 +60,7 @@ func (repository *OrderRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx,
 
 func (repository *OrderRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Order {
 	SQL := `
-		SELECT id, table_id, status, payment_status, total, created_at
+		SELECT id, name, table_id, status, payment_status, total, created_at
 		FROM orders
 		WHERE created_at >= NOW() - INTERVAL '30 days'
 	`
@@ -69,7 +71,7 @@ func (repository *OrderRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) 
 	var orders []domain.Order
 	for rows.Next() {
 		order := domain.Order{}
-		err := rows.Scan(&order.ID, &order.TableID, &order.Status, &order.PaymentStatus, &order.Total, &order.CreatedAt)
+		err := rows.Scan(&order.ID, &order.Name, &order.TableID, &order.Status, &order.PaymentStatus, &order.Total, &order.CreatedAt)
 		helper.PanicIfError(err)
 		orders = append(orders, order)
 	}

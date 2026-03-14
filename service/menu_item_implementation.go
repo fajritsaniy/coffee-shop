@@ -99,17 +99,14 @@ func (service *MenuItemServiceImpl) FindById(ctx context.Context, menuItemId int
 	return helper.ToMenuItemResponse(menuItem)
 }
 
-func (service *MenuItemServiceImpl) FindByCategoryID(ctx context.Context, categoryId int) web.MenuItemResponse {
+func (service *MenuItemServiceImpl) FindByCategoryID(ctx context.Context, categoryId int) []web.MenuItemResponse {
 	tx, err := service.DB.Begin()
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	menuItem, err := service.MenuItemRepository.FindByCategoryID(ctx, tx, categoryId)
-	if err != nil {
-		panic(exception.NewNotFoundError(err.Error()))
-	}
+	menuItems := service.MenuItemRepository.FindByCategoryID(ctx, tx, categoryId)
 
-	return helper.ToMenuItemResponse(menuItem)
+	return helper.ToMenuItemResponses(menuItems)
 }
 
 func (service *MenuItemServiceImpl) FindAll(ctx context.Context) []web.MenuItemResponse {

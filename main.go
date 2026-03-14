@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"log" // <--- Add this import for logging errors properly
 	"net/http"
 
 	"github.com/fajri/coffee-api/app"
@@ -18,6 +16,7 @@ import (
 	"os"
 	"github.com/joho/godotenv"
 	"log/slog"
+	"strings"
 )
 
 func main() {
@@ -60,15 +59,17 @@ func main() {
 	// Initialize your main router (from app.NewRouter)
 	mainRouter := app.NewRouter(tableController, menuCategoryController, menuItemController, orderController)
 
-	// --- Start CORS Configuration ---
 	// Configure the CORS middleware options
-	allowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
-	if allowedOrigins == "" {
-		allowedOrigins = "http://localhost:3000"
+	allowedOriginsStr := os.Getenv("CORS_ALLOWED_ORIGINS")
+	var allowedOrigins []string
+	if allowedOriginsStr == "" {
+		allowedOrigins = []string{"http://localhost:3000", "http://localhost:8080", "http://localhost:3002"}
+	} else {
+		allowedOrigins = strings.Split(allowedOriginsStr, ",")
 	}
 
 	corsOptions := cors.Options{
-		AllowedOrigins:   []string{allowedOrigins},                              // Your frontend's origin
+		AllowedOrigins:   allowedOrigins,                                         // Your frontend's origin
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},    // Common HTTP methods
 		AllowedHeaders:   []string{"Content-Type", "Authorization", "X-Api-Key"}, // Common headers, include Authorization if your frontend sends tokens
 		AllowCredentials: true,                                                   // Set to true if your frontend sends cookies or authorization headers

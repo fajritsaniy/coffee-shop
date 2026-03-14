@@ -5,13 +5,13 @@ WORKDIR /app
 
 # Install dependencies
 COPY go.mod go.sum ./
-RUN go mod download
+RUN go mod download && go get github.com/joho/godotenv
 
 # Copy source code
 COPY . .
 
-# Build the application
-RUN go build -o coffee-shop main.go
+# Update dependencies and build
+RUN go mod tidy && go build -o coffee-shop main.go
 
 # Final stage
 FROM alpine:latest

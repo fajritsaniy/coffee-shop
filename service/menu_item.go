@@ -11,6 +11,6 @@ type MenuItemService interface {
 	Update(ctx context.Context, request web.UpdateMenuItemRequest) web.MenuItemResponse
 	Delete(ctx context.Context, itemId int)
 	FindById(ctx context.Context, itemId int) web.MenuItemResponse
-	FindByCategoryID(ctx context.Context, categoryId int) web.MenuItemResponse
+	FindByCategoryID(ctx context.Context, categoryId int) []web.MenuItemResponse
 	FindAll(ctx context.Context) []web.MenuItemResponse
 }

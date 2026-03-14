@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http" // Make sure http is imported
+	"os"
 
 	"github.com/fajri/coffee-api/helper"
 	"github.com/fajri/coffee-api/model/web"
@@ -16,19 +17,25 @@ func NewAuthMiddleware(handler http.Handler) *AuthMiddleware {
 }
 
 func (middleware *AuthMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// --- START: CRITICAL CHANGE FOR CORS ---
-	// Allow OPTIONS requests to pass through without authentication.
-	// Browsers send OPTIONS as a preflight for CORS.
-	if r.Method == http.MethodOptions {
-		middleware.Handler.ServeHTTP(w, r) // Pass control to the next handler (CORS middleware)
-		return                             // Stop processing here for OPTIONS requests
+	// 1. Always allow OPTIONS (CORS preflight) and health check
+	if r.Method == http.MethodOptions || r.URL.Path == "/api/v1/health" {
+		middleware.Handler.ServeHTTP(w, r)
+		return
 	}
-	// --- END: CRITICAL CHANGE FOR CORS ---
 
-	// Your existing authentication logic for other HTTP methods
+	// 2. Allow Cashier functionality (Public access)
+	// - All GET requests (menu browsing, categories)
+	// - Creating an order (POST /api/v1/orders)
+	if r.Method == http.MethodGet || (r.Method == http.MethodPost && r.URL.Path == "/api/v1/orders") {
+		middleware.Handler.ServeHTTP(w, r)
+		return
+	}
+
+	// 3. Admin functionality (Requires RAHASIA API Key)
+	// For POST, PUT, DELETE operations on menu items, categories, etc.
 	apiKey := os.Getenv("API_KEY")
 	if apiKey == "" {
-		apiKey = "RAHASIA" // Default fallback
+		apiKey = "RAHASIA"
 	}
 
 	if apiKey == r.Header.Get("X-API-Key") {

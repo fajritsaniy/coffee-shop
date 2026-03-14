@@ -1,6 +1,8 @@
 package app
 
 import (
+	"net/http"
+
 	"github.com/fajri/coffee-api/controller"
 	"github.com/fajri/coffee-api/exception"
 	"github.com/julienschmidt/httprouter"
@@ -8,6 +10,12 @@ import (
 
 func NewRouter(tableController controller.TableController, menuCategory controller.MenuCategoryController, menuItem controller.MenuItemController, order controller.OrderController) *httprouter.Router {
 	router := httprouter.New()
+
+	// Health Check
+	router.GET("/api/v1/health", func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"UP","message":"Coffee Shop API is running"}`))
+	})
 
 	// Table
 	router.GET("/api/v1/tables", tableController.FindAll)

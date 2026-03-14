@@ -12,6 +12,6 @@ type MenuItemRepository interface {
 	Update(ctx context.Context, tx *sql.Tx, menuItem domain.MenuItem) domain.MenuItem
 	Delete(ctx context.Context, tx *sql.Tx, menuItem domain.MenuItem)
 	FindById(ctx context.Context, tx *sql.Tx, id int) (domain.MenuItem, error)
-	FindByCategoryID(ctx context.Context, tx *sql.Tx, categoryId int) (domain.MenuItem, error)
+	FindByCategoryID(ctx context.Context, tx *sql.Tx, categoryId int) []domain.MenuItem
 	FindAll(ctx context.Context, tx *sql.Tx) []domain.MenuItem
 }

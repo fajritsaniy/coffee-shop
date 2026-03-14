@@ -19,7 +19,10 @@ migrate:
 	# migrate -path migrations -database "$(DB_URL)" up
 
 docker-up:
-	docker-compose up -d
+	docker compose up -d --build
 
 docker-down:
-	docker-compose down
+	docker compose down
+
+docker-logs:
+	docker compose logs -f

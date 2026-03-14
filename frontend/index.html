@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COFFEE SHOP | Minimalist</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <header>
+        <div class="logo">CASHIER MODE / ORDERS</div>
+        <nav>
+            <a href="admin.html" class="nav-link">ADMIN PANEL</a>
+            <button id="cart-toggle">CART (0)</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section id="categories-section">
+            <div id="categories-list" class="flex-row">
+                <!-- Categories will be injected here -->
+            </div>
+        </section>
+
+        <section id="menu-section">
+            <div id="menu-grid" class="grid">
+                <!-- Menu items will be injected here -->
+            </div>
+        </section>
+    </main>
+
+    <aside id="cart-sidebar" class="hidden">
+        <div class="cart-header">
+            <h2>YOUR ORDER</h2>
+            <button id="close-cart">CLOSE</button>
+        </div>
+        <div id="cart-items">
+            <!-- Cart items will be injected here -->
+        </div>
+        <div class="cart-footer">
+            <div class="total">TOTAL: <span id="cart-total">$0.00</span></div>
+            <button id="checkout-btn" class="btn-black">PLACE ORDER</button>
+        </div>
+    </aside>
+
+    <div id="notification" class="hidden"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

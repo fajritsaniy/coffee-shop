@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Coffee Management</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="admin-page">
+    <header>
+        <div class="logo">ADMIN PANEL / STOCK</div>
+        <nav>
+            <a href="index.html" class="nav-link">CASHIER MODE</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="admin-header">
+            <h2>Inventory Management</h2>
+            <button id="add-item-btn" class="primary-btn">
+                <i data-lucide="plus"></i> ADD NEW ITEM
+            </button>
+        </div>
+
+        <div class="admin-table-container">
+            <table id="menu-table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="menu-list">
+                    <!-- Rows injected by admin.js -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal for Add/Edit -->
+    <div id="item-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="modal-title">Add Menu Item</h3>
+            <form id="item-form">
+                <input type="hidden" id="item-id">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="item-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="item-category" required>
+                        <!-- Categories injected -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Price (in cents)</label>
+                    <input type="number" id="item-price" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="item-description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="text" id="item-image-url">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="close-modal" class="secondary-btn">CANCEL</button>
+                    <button type="submit" class="primary-btn">SAVE CHANGES</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="notification" class="hidden"></div>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>

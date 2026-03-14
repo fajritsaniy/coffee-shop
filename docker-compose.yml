@@ -2,15 +2,13 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:latest
+    image: postgres:15-alpine
     environment:
       POSTGRES_USER: fajri
       POSTGRES_DB: coffee_app_test
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
-    volumes:
-      - db-data:/var/lib/postgresql/data
 
   api:
     build: .
@@ -21,9 +19,17 @@ services:
       - DB_URL=postgres://fajri:@db:5432/coffee_app_test?sslmode=disable
       - API_KEY=RAHASIA
       - SERVER_ADDR=:3001
-      - CORS_ALLOWED_ORIGINS=http://localhost:3000
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3002
     depends_on:
       - db
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3002:80"
+    depends_on:
+      - api
 
 volumes:
   db-data:

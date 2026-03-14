@@ -26,7 +26,12 @@ func (middleware *AuthMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	// --- END: CRITICAL CHANGE FOR CORS ---
 
 	// Your existing authentication logic for other HTTP methods
-	if "RAHASIA" == r.Header.Get("X-API-Key") {
+	apiKey := os.Getenv("API_KEY")
+	if apiKey == "" {
+		apiKey = "RAHASIA" // Default fallback
+	}
+
+	if apiKey == r.Header.Get("X-API-Key") {
 		middleware.Handler.ServeHTTP(w, r)
 	} else {
 		w.Header().Set("Content-Type", "application/json")

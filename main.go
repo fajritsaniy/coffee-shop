@@ -15,11 +15,24 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/rs/cors" // <--- Import the cors package
+	"os"
+	"github.com/joho/godotenv"
+	"log/slog"
 )
 
 func main() {
+	// Configure slog
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
 
-	fmt.Println("Service is running...")
+	slog.Info("Service is starting...")
+
+	// Load .env file
+	err := godotenv.Load()
+	if err != nil {
+		slog.Warn("Error loading .env file, using system environment variables", "error", err)
+	}
+
 	db := app.NewDB()
 	validate := validator.New()
 
@@ -49,8 +62,13 @@ func main() {
 
 	// --- Start CORS Configuration ---
 	// Configure the CORS middleware options
+	allowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
+	if allowedOrigins == "" {
+		allowedOrigins = "http://localhost:3000"
+	}
+
 	corsOptions := cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},                      // Your frontend's origin
+		AllowedOrigins:   []string{allowedOrigins},                              // Your frontend's origin
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},    // Common HTTP methods
 		AllowedHeaders:   []string{"Content-Type", "Authorization", "X-Api-Key"}, // Common headers, include Authorization if your frontend sends tokens
 		AllowCredentials: true,                                                   // Set to true if your frontend sends cookies or authorization headers
@@ -62,12 +80,17 @@ func main() {
 
 	// Now, wrap the CORS handler with your authentication middleware
 	// The request flow will be: CORS -> Auth -> Router
+	serverAddr := os.Getenv("SERVER_ADDR")
+	if serverAddr == "" {
+		serverAddr = "localhost:3001"
+	}
+
 	server := http.Server{
-		Addr:    "localhost:3001",
+		Addr:    serverAddr,
 		Handler: middleware.NewAuthMiddleware(corsHandler), // <--- Use the corsHandler here
 	}
 
-	log.Printf("Server listening on %s", server.Addr) // <--- Better logging for server start
-	err := server.ListenAndServe()
-	helper.PanicIfError(err) // Consider using log.Fatal for more robust error handling in main
+	slog.Info("Server listening", "addr", server.Addr)
+	err = server.ListenAndServe()
+	helper.ExitIfError(err) // Using ExitIfError instead of PanicIfError for graceful shutdown failure
 }
